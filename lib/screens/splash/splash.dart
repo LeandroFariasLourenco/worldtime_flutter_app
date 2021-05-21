@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:world_time_flutter_app/core/contexts/home.dart';
+import 'package:world_time_flutter_app/core/models/pais.dart';
 import 'package:world_time_flutter_app/core/services/worldtime_service.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class Loading extends StatefulWidget {
+class Splash extends StatefulWidget {
   @override
-  _LoadingState createState() => _LoadingState();
+  _SplashState createState() => _SplashState();
 }
 
-class _LoadingState extends State<Loading> {
+class _SplashState extends State<Splash> {
   void getCurrentTimezone() async {
     WorldTimeService worldTimeService = WorldTimeService(
-        location: 'Berlin', flag: 'germany.png', timezone: 'Europe/Berlin');
-    await worldTimeService.getTimezone();
+      pais: Pais(
+          localizacao: 'Berlin',
+          bandeira: 'germany.png',
+          fusoHorario: 'Europe/Berlin'),
+    );
+    await worldTimeService.getTimezone(context);
 
+    Provider.of<HomeContext>(context, listen: false).pais =
+        worldTimeService.pais;
     Future.delayed(Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, '/home', arguments: {
-        'time': worldTimeService.time,
-        'location': worldTimeService.location,
-        'flag': worldTimeService.flag,
-        'isDaytime': worldTimeService.isDayTime
-      });
+      Navigator.pushReplacementNamed(context, '/home');
     });
   }
 

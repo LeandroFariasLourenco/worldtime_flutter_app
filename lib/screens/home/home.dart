@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:world_time_flutter_app/core/contexts/home.dart';
+import 'package:world_time_flutter_app/core/models/pais.dart';
+import 'package:world_time_flutter_app/screens/home/widgets/editar_local.dart';
+import 'package:provider/provider.dart';
+import 'package:world_time_flutter_app/shared/widgets/app_pais.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -6,18 +11,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Map timezone = {};
+  Pais pais;
 
   @override
   Widget build(BuildContext context) {
-    this.timezone = this.timezone.isNotEmpty
-        ? this.timezone
-        : ModalRoute.of(context).settings.arguments;
+    this.pais = context.watch<HomeContext>().paisSelecionado;
 
-    String bgImage = this.timezone['isDaytime'] ? 'day.png' : 'night.png';
-    Color bgColor =
-        this.timezone['isDaytime'] ? Colors.blue : Colors.indigo[700];
-
+    String bgImage = this.pais.ehDia ? 'day.png' : 'night.png';
+    Color bgColor = this.pais.ehDia ? Colors.blue : Colors.indigo[700];
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -31,60 +32,7 @@ class _HomeState extends State<Home> {
           child: Padding(
             padding: EdgeInsets.fromLTRB(0, 120.0, 0, 0),
             child: Column(
-              children: <Widget>[
-                SizedBox(
-                  width: 150.0,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
-                      elevation: 0.0,
-                    ),
-                    onPressed: () async {
-                      dynamic selectedTimezone =
-                          await Navigator.pushNamed(context, '/location');
-                      setState(() {
-                        this.timezone = {
-                          'time': selectedTimezone['time'],
-                          'location': selectedTimezone['location'],
-                          'flag': selectedTimezone['flag'],
-                          'isDaytime': selectedTimezone['isDaytime'],
-                        };
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.edit_location),
-                        Text('Edit location'),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      this.timezone['location'],
-                      style: TextStyle(
-                        fontSize: 28.0,
-                        letterSpacing: 2.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.0),
-                Text(
-                  this.timezone['time'],
-                  style: TextStyle(
-                    fontSize: 66.0,
-                    color: Colors.white,
-                  ),
-                )
-              ],
+              children: <Widget>[EditarLocal(), AppPais(pais: this.pais)],
             ),
           ),
         ),
